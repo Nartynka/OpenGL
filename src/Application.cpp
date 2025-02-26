@@ -131,6 +131,8 @@ int main()
 	/* Make the window's context current */
 	glfwMakeContextCurrent(window);
 
+	glfwSwapInterval(1);
+
 	if (glewInit() != GLEW_OK)
 		std::cout << "ERROR!!" << std::endl;
 
@@ -140,26 +142,45 @@ int main()
 		-0.5f, -0.5f,
 		 0.5f, -0.5f,
 		 0.5f, 0.5f,
-
-		 0.5f, 0.5f,
 		-0.5f, 0.5f,
-		-0.5f, -0.5f
 	};
 
+	// counterclockwise drawing
+	unsigned int indices[]
+	{
+		0, 1, 2,
+		2, 3, 0
+	};
 
 
 	unsigned int buffer;
 	glGenBuffers(1, &buffer); // create a buffer
 	glBindBuffer(GL_ARRAY_BUFFER, buffer); // "select" buffer
-	glBufferData(GL_ARRAY_BUFFER, 6 * 2 * sizeof(float), positions, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, 4 * 2 * sizeof(float), positions, GL_STATIC_DRAW);
 
+	// vertex attribute that will be passed into the vertex shader
+	// we have only one attribute - position of a single vertex that is represented by two floats
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0);
+
+
+	unsigned int ibo; // index buffer object
+	glGenBuffers(1, &ibo); // create a buffer
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo); // "select" buffer
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(unsigned int), indices, GL_STATIC_DRAW);
+
 
 	ShaderProgramSource source = ParseShader("res/shaders/Basic.shader");
 
 	unsigned int shader = CreateShader(source.VertexSource, source.FragmentSource);
 	glUseProgram(shader);
+
+	int location = glGetUniformLocation(shader, "u_Color");
+
+	float r = 0.0f;
+	float g = 1.0f;
+	float increment_r = 0.01f;
+	float increment_g = 0.01f;
 
 	/* Loop until the user closes the window */
 	while (!glfwWindowShouldClose(window))
@@ -167,9 +188,23 @@ int main()
 		/* Render here */
 		glClear(GL_COLOR_BUFFER_BIT);
 
+		glUniform4f(location, r, g, 0.4f, 1.f);
 		// Draw the triangle
-		glDrawArrays(GL_TRIANGLES, 0, 6);
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 
+
+		if (r > 1.0f)
+			increment_r = -0.01f;
+		else if (r < 0.0f)
+			increment_r = 0.01f;
+
+		if (g > 1.0f)
+			increment_g = -0.01f;
+		else if (g < 0.0f)
+			increment_g = 0.01f;
+
+		r += increment_r;
+		g += increment_g;
 		/* Swap front and back buffers */
 		glfwSwapBuffers(window);
 
