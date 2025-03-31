@@ -1,5 +1,7 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#define STB_IMAGE_IMPLEMENTATION
+#include "lib/stb_image.h"
 
 #include <iostream>
 #include <fstream>
@@ -111,6 +113,10 @@ static unsigned int CreateShader(const std::string& vertexShader, const std::str
 	return program;
 }
 
+void LoadAndCreateTexture(const std::string& filepath)
+{
+
+}
 
 int main()
 {
@@ -145,13 +151,22 @@ int main()
 	std::cout << glGetString(GL_VERSION) << std::endl;
 	
 	// vertices positions
-	float positions[] = {
-		-0.5f, -0.5f,
-		 0.5f, -0.5f,
-		 0.5f, 0.5f,
-		-0.5f, 0.5f,
+	//float positions[] = {
+	//	-0.5f, -0.5f,
+	//	 0.5f, -0.5f,
+	//	 0.5f, 0.5f,
+	//	-0.5f, 0.5f,
+	//};
+
+	float vertices[] = {
+		// positions   // colors          // texture coords
+		-0.5f, -0.5f,  1.0f, 0.5f, 0.1f,  0.0f, 0.0f,
+		 0.5f, -0.5f,  0.4f, 1.0f, 0.6f,  1.0f, 0.0f,
+		 0.5f, 0.5f,   0.4f, 0.6f, 1.0f,  1.0f, 1.0f,
+		-0.5f, 0.5f,   0.8f, 0.5f, 0.5f,  0.0f, 1.0f
 	};
 
+	
 	// indices of positions of vertices of two triangles that will make a rectangle
 	// counterclockwise drawing
 	unsigned int indices[]
@@ -170,13 +185,20 @@ int main()
 	glGenBuffers(1, &buffer); // create a buffer
 	glBindBuffer(GL_ARRAY_BUFFER, buffer); // if we want to change something about the buffer, we have to first "select it" aka. bind it
 	// 4 * 2 -> 4 vertices, 2 floats each
-	glBufferData(GL_ARRAY_BUFFER, 4 * 2 * sizeof(float), positions, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, 4 * 2 * 3 * 2 * sizeof(float), vertices, GL_STATIC_DRAW);
 
 	// vertex attribute that will be passed into the vertex shader
 	// we have only one attribute - position of a single vertex that is represented by two floats
 	glEnableVertexAttribArray(0);
 	// this line actually binds/links the current bind buffer to the vao
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0); // structure of a vertex buffer (each vertex consists of 2 floats and etc.)
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 7 * sizeof(float), 0); // structure of a vertex buffer (each vertex consists of 2 floats and etc.)
+
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void*)(2 * sizeof(float)));
+
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void*)(5 * sizeof(float)));
+
 
 	// we use index buffer to eliminate the need to store some vertices twice 
 	// (rectangle is made of to triangles next to each other so two vertices would be stored twice and that is not good for memory)
@@ -201,8 +223,32 @@ int main()
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);	
 	glUseProgram(0);
-	// "wire frame mode"
+	// "wireframe mode"
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+
+	stbi_set_flip_vertically_on_load(1);
+
+	int width, height, nrChannels;
+	unsigned char* data = stbi_load("res/sysop.gif", &width, &height, &nrChannels, 0);
+	
+	unsigned int texture;
+	glGenTextures(1, &texture);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, texture);
+
+	if (data)
+	{
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else
+	{
+		std::cout << "Failed to load texture" << std::endl;
+	}
+
+	stbi_image_free(data);
 
 	/* Loop until the user closes the window */
 	while (!glfwWindowShouldClose(window))
@@ -217,21 +263,10 @@ int main()
 
 		glBindVertexArray(vao);
 		glUseProgram(shader);
-	
-		float time = glfwGetTime();
-		float g = sin(time) / 2.0f + 0.5f;
-
-		glUniform4f(location, r, g, 0.8f, 1.f);
 
 		// Draw the triangle
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 
-		if (r > 1.0f)
-			increment = -0.01f;
-		else if (r < 0.0f)
-			increment = 0.01f;
-
-		r += increment;
 
 		/* Swap front and back buffers */
 		glfwSwapBuffers(window);
