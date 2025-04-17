@@ -3,6 +3,10 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "lib/stb_image.h"
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -212,17 +216,12 @@ int main()
 
 	unsigned int shader = CreateShader(source.VertexSource, source.FragmentSource);
 	glUseProgram(shader);
-
-	int location = glGetUniformLocation(shader, "u_Color");
-
-	float r = 0.0f;
-	float increment = 0.01f;
 	
 	// clear all gl states
-	glBindVertexArray(0); // vao stores binding and unbinding so if we want to just clear states, we have to unbind vao first. Otherwise vao will store the unbinds and we will have to bind everything again before draw.
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);	
-	glUseProgram(0);
+	//glBindVertexArray(0); // vao stores binding and unbinding so if we want to just clear states, we have to unbind vao first. Otherwise vao will store the unbinds and we will have to bind everything again before draw.
+	//glBindBuffer(GL_ARRAY_BUFFER, 0);
+	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);	
+	//glUseProgram(0);
 	// "wireframe mode"
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
@@ -250,6 +249,9 @@ int main()
 
 	stbi_image_free(data);
 
+	
+	unsigned int transformLoc = glGetUniformLocation(shader, "transform");
+
 	/* Loop until the user closes the window */
 	while (!glfwWindowShouldClose(window))
 	{
@@ -260,13 +262,16 @@ int main()
 		// vao stores the binds so we don't have to bind them here, just binding the vao will suffice
 		//glBindBuffer(GL_ARRAY_BUFFER, buffer);
 		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+		
+		glm::mat4 transform = glm::mat4(1.0f);
+		float scaleAmount = (sin(glfwGetTime())+1.f) / 2.f;
+		transform = glm::rotate(transform, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
+		transform = glm::scale(transform, glm::vec3(scaleAmount, scaleAmount, scaleAmount));
+		glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
 
 		glBindVertexArray(vao);
-		glUseProgram(shader);
-
 		// Draw the triangle
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
-
 
 		/* Swap front and back buffers */
 		glfwSwapBuffers(window);
