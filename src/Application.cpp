@@ -130,7 +130,6 @@ int main()
 	if (!glfwInit())
 		return -1;
 
-
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -154,6 +153,8 @@ int main()
 
 	std::cout << glGetString(GL_VERSION) << std::endl;
 	
+	glEnable(GL_DEPTH_TEST);
+
 	// vertices positions
 	//float positions[] = {
 	//	-0.5f, -0.5f,
@@ -162,7 +163,8 @@ int main()
 	//	-0.5f, 0.5f,
 	//};
 
-	float vertices[] = {
+	float vertices[] = 
+	{
 		// positions   // colors          // texture coords
 		-0.5f, -0.5f,  1.0f, 0.5f, 0.1f,  0.0f, 0.0f,
 		 0.5f, -0.5f,  0.4f, 1.0f, 0.6f,  1.0f, 0.0f,
@@ -170,13 +172,73 @@ int main()
 		-0.5f, 0.5f,   0.8f, 0.5f, 0.5f,  0.0f, 1.0f
 	};
 
-	
+
 	// indices of positions of vertices of two triangles that will make a rectangle
 	// counterclockwise drawing
-	unsigned int indices[]
+	unsigned int indices[] = 
 	{
 		0, 1, 2,
 		2, 3, 0
+	};
+
+	// 36 vertices (6 faces * 2 triangles * 3 vertices)
+	float cube[] = {
+	// position			   // color			   // texture coords
+	-0.5f, -0.5f, -0.5f,   1.0f, 0.5f, 0.1f,   0.0f, 0.0f,
+	 0.5f, -0.5f, -0.5f,   0.4f, 1.0f, 0.6f,   1.0f, 0.0f,
+	 0.5f,  0.5f, -0.5f,   0.4f, 0.6f, 1.0f,   1.0f, 1.0f,
+	 0.5f,  0.5f, -0.5f,   0.4f, 0.6f, 1.0f,   1.0f, 1.0f,
+	-0.5f,  0.5f, -0.5f,   0.8f, 0.5f, 0.5f,   0.0f, 1.0f,
+	-0.5f, -0.5f, -0.5f,   1.0f, 0.5f, 0.1f,   0.0f, 0.0f,
+
+	-0.5f, -0.5f,  0.5f,   1.0f, 0.5f, 0.1f,   0.0f, 0.0f,
+	 0.5f, -0.5f,  0.5f,   0.4f, 1.0f, 0.6f,   1.0f, 0.0f,
+	 0.5f,  0.5f,  0.5f,   0.4f, 0.6f, 1.0f,   1.0f, 1.0f,
+	 0.5f,  0.5f,  0.5f,   0.4f, 0.6f, 1.0f,   1.0f, 1.0f,
+	-0.5f,  0.5f,  0.5f,   0.8f, 0.5f, 0.5f,   0.0f, 1.0f,
+	-0.5f, -0.5f,  0.5f,   1.0f, 0.5f, 0.1f,   0.0f, 0.0f,
+
+	-0.5f,  0.5f,  0.5f,   1.0f, 0.5f, 0.1f,   1.0f, 0.0f,
+	-0.5f,  0.5f, -0.5f,   0.4f, 1.0f, 0.6f,   1.0f, 1.0f,
+	-0.5f, -0.5f, -0.5f,   0.4f, 0.6f, 1.0f,   0.0f, 1.0f,
+	-0.5f, -0.5f, -0.5f,   0.4f, 0.6f, 1.0f,   0.0f, 1.0f,
+	-0.5f, -0.5f,  0.5f,   0.8f, 0.5f, 0.5f,   0.0f, 0.0f,
+	-0.5f,  0.5f,  0.5f,   1.0f, 0.5f, 0.1f,   1.0f, 0.0f,
+
+	 0.5f,  0.5f,  0.5f,   1.0f, 0.5f, 0.1f,   1.0f, 0.0f,
+	 0.5f,  0.5f, -0.5f,   0.4f, 1.0f, 0.6f,   1.0f, 1.0f,
+	 0.5f, -0.5f, -0.5f,   0.4f, 0.6f, 1.0f,   0.0f, 1.0f,
+	 0.5f, -0.5f, -0.5f,   0.4f, 0.6f, 1.0f,   0.0f, 1.0f,
+	 0.5f, -0.5f,  0.5f,   0.8f, 0.5f, 0.5f,   0.0f, 0.0f,
+	 0.5f,  0.5f,  0.5f,   1.0f, 0.5f, 0.1f,   1.0f, 0.0f,
+
+	-0.5f, -0.5f, -0.5f,   1.0f, 0.5f, 0.1f,   0.0f, 1.0f,
+	 0.5f, -0.5f, -0.5f,   0.4f, 1.0f, 0.6f,   1.0f, 1.0f,
+	 0.5f, -0.5f,  0.5f,   0.4f, 0.6f, 1.0f,   1.0f, 0.0f,
+	 0.5f, -0.5f,  0.5f,   0.4f, 0.6f, 1.0f,   1.0f, 0.0f,
+	-0.5f, -0.5f,  0.5f,   0.8f, 0.5f, 0.5f,   0.0f, 0.0f,
+	-0.5f, -0.5f, -0.5f,   1.0f, 0.5f, 0.1f,   0.0f, 1.0f,
+
+	-0.5f,  0.5f, -0.5f,   1.0f, 0.5f, 0.1f,   0.0f, 1.0f,
+	 0.5f,  0.5f, -0.5f,   0.4f, 1.0f, 0.6f,   1.0f, 1.0f,
+	 0.5f,  0.5f,  0.5f,   0.4f, 0.6f, 1.0f,   1.0f, 0.0f,
+	 0.5f,  0.5f,  0.5f,   0.4f, 0.6f, 1.0f,   1.0f, 0.0f,
+	-0.5f,  0.5f,  0.5f,   0.8f, 0.5f, 0.5f,   0.0f, 0.0f,
+	-0.5f,  0.5f, -0.5f,   1.0f, 0.5f, 0.1f,   0.0f, 1.0f
+	};
+
+	glm::vec3 cubePositions[] = 
+	{
+		glm::vec3(0.0f,  0.0f,  0.0f),
+		glm::vec3(2.0f,  5.0f, -15.0f),
+		glm::vec3(-1.5f, -2.2f, -2.5f),
+		glm::vec3(-3.8f, -2.0f, -12.3f),
+		glm::vec3(2.4f, -0.4f, -3.5f),
+		glm::vec3(-1.7f,  3.0f, -7.5f),
+		glm::vec3(1.3f, -2.0f, -2.5f),
+		glm::vec3(1.5f,  2.0f, -2.5f),
+		glm::vec3(1.5f,  0.2f, -1.5f),
+		glm::vec3(-1.3f,  1.0f, -1.5f)
 	};
 
 	// vertex array object
@@ -188,34 +250,39 @@ int main()
 	unsigned int buffer;
 	glGenBuffers(1, &buffer); // create a buffer
 	glBindBuffer(GL_ARRAY_BUFFER, buffer); // if we want to change something about the buffer, we have to first "select it" aka. bind it
-	// 4 * 2 -> 4 vertices, 2 floats each
-	glBufferData(GL_ARRAY_BUFFER, 4 * 2 * 3 * 2 * sizeof(float), vertices, GL_STATIC_DRAW);
+	// 4 vertices, 2 floats position, 3 floats color, 2 float texture
+	//glBufferData(GL_ARRAY_BUFFER, 4 * 2 * 3 * 2 * sizeof(float), vertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(cube), cube, GL_STATIC_DRAW);
 
 	// vertex attribute that will be passed into the vertex shader
-	// we have only one attribute - position of a single vertex that is represented by two floats
+	// we have three attributes - position of a single vertex that is represented by 7 floats, color (3 floats) and texture coords (2 floats)
 	glEnableVertexAttribArray(0);
 	// this line actually binds/links the current bind buffer to the vao
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 7 * sizeof(float), 0); // structure of a vertex buffer (each vertex consists of 2 floats and etc.)
+	//glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 7 * sizeof(float), 0); // structure of a vertex buffer (each vertex consists of 7 floats and etc.)
+	// position
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), 0);
 
+	// color
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void*)(2 * sizeof(float)));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
 
+	// texture coords
 	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void*)(5 * sizeof(float)));
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
 
 
 	// we use index buffer to eliminate the need to store some vertices twice 
 	// (rectangle is made of to triangles next to each other so two vertices would be stored twice and that is not good for memory)
-	unsigned int ibo; // index/element buffer object
-	glGenBuffers(1, &ibo); // create a buffer
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo); // "select" buffer
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(unsigned int), indices, GL_STATIC_DRAW);
+	//unsigned int ibo; // index/element buffer object
+	//glGenBuffers(1, &ibo); // create a buffer
+	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo); // "select" buffer
+	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(unsigned int), indices, GL_STATIC_DRAW);
 
 
 	ShaderProgramSource source = ParseShader("res/shaders/Basic.shader");
 
-	unsigned int shader = CreateShader(source.VertexSource, source.FragmentSource);
-	glUseProgram(shader);
+	unsigned int shaderId = CreateShader(source.VertexSource, source.FragmentSource);
+	glUseProgram(shaderId);
 	
 	// clear all gl states
 	//glBindVertexArray(0); // vao stores binding and unbinding so if we want to just clear states, we have to unbind vao first. Otherwise vao will store the unbinds and we will have to bind everything again before draw.
@@ -249,29 +316,55 @@ int main()
 
 	stbi_image_free(data);
 
-	
-	unsigned int transformLoc = glGetUniformLocation(shader, "transform");
+	unsigned int modelLoc = glGetUniformLocation(shaderId, "model");
+	unsigned int viewLoc = glGetUniformLocation(shaderId, "view");
+	unsigned int projectionLoc = glGetUniformLocation(shaderId, "projection");
+
+	unsigned int transformLoc = glGetUniformLocation(shaderId, "transform");
 
 	/* Loop until the user closes the window */
 	while (!glfwWindowShouldClose(window))
 	{
 		/* Render here */
 		glClearColor(0.5f, 0.7f, 0.8f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+		glBindVertexArray(vao);
 		// vao stores the binds so we don't have to bind them here, just binding the vao will suffice
 		//glBindBuffer(GL_ARRAY_BUFFER, buffer);
 		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
 		
 		glm::mat4 transform = glm::mat4(1.0f);
-		float scaleAmount = (sin(glfwGetTime())+1.f) / 2.f;
 		transform = glm::rotate(transform, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
-		transform = glm::scale(transform, glm::vec3(scaleAmount, scaleAmount, scaleAmount));
 		glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
 
-		glBindVertexArray(vao);
+		//glm::mat4 model = glm::mat4(1.0f);
+		glm::mat4 view = glm::mat4(1.0f);
+		glm::mat4 projection;
+
+		//model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		//model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
+		view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+		projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
+
+		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+		glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
+
+
+		for (auto cubePosition : cubePositions)
+		{
+			glm::mat4 model = glm::mat4(1.0f);
+			model = glm::translate(model, cubePosition);
+			model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
+			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+
+			glDrawArrays(GL_TRIANGLES, 0, 36);
+		}
+
 		// Draw the triangle
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+		//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+
+		//glDrawArrays(GL_TRIANGLES, 0, 36);
 
 		/* Swap front and back buffers */
 		glfwSwapBuffers(window);
@@ -280,7 +373,7 @@ int main()
 		glfwPollEvents();
 	}
 
-	glDeleteProgram(shader);
+	glDeleteProgram(shaderId);
 
 	glfwTerminate();
 	return 0;
